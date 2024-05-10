@@ -65,7 +65,7 @@ class ProductDetectorPageState extends State<ProductDetectorPage> {
     setState(() {
       isLoading = true; // Start loading
     });
-    String imageBase64 = base64Encode(await _image!.readAsBytes());
+    String imageBase64 = base64.encode(await _image!.readAsBytes());
 
     try {
       var imageService = ImageService();

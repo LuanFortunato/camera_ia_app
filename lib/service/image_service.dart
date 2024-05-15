@@ -16,7 +16,7 @@ class ImageService {
 
   Future<http.Response> _postDetailsDetectionRequest(String imageBase64) async {
     return await http.post(
-      Uri.parse("http://10.10.30.254:5000/process-image"),
+      Uri.parse("https://api-ia-codes-emzwntskvq-rj.a.run.app/process-image"),
       headers: {
         "Content-Type": "application/json",
       },
@@ -50,14 +50,7 @@ class ImageService {
     if (details.isEmpty) {
       details.add(Details(name: "No items found", quantity: "0"));
     }
-    // Mostrar a lista de detalhes
 
     return details;
-
-    // else {
-    //     // Fallback: if the JSON does not contain expected structure,
-
-    //   throw Exception("No valid JSON content found");
-    // }
   }
 }

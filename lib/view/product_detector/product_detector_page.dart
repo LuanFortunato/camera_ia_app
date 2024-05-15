@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../model/details.dart';
+import '../../model/details.dart';
 import 'image_details_widget.dart';
-import '../service/image_service.dart';
+import '../../service/image_service.dart';
 
 class ProductDetectorPage extends StatefulWidget {
   const ProductDetectorPage({super.key});
@@ -24,28 +24,6 @@ class ProductDetectorPageState extends State<ProductDetectorPage> {
 
   Future<void> pickImage() async {
     const ImageSource source = ImageSource.camera;
-    // final ImageSource? source = await showDialog<ImageSource>(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return SimpleDialog(
-    //       title: const Text('Select Image Source'),
-    //       children: <Widget>[
-    //         SimpleDialogOption(
-    //           onPressed: () {
-    //             Navigator.pop(context, ImageSource.gallery);
-    //           },
-    //           child: const Text('Gallery'),
-    //         ),
-    //         SimpleDialogOption(
-    //           onPressed: () {
-    //             Navigator.pop(context, ImageSource.camera);
-    //           },
-    //           child: const Text('Camera'),
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
 
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
@@ -70,13 +48,12 @@ class ProductDetectorPageState extends State<ProductDetectorPage> {
     try {
       var imageService = ImageService();
       var newList = await imageService.detectImage(imageBase64);
-      // Update state with the list of Details
       setState(() {
-        imageList = newList; // Update state with the list of Details
+        imageList = newList;
       });
     } finally {
       setState(() {
-        isLoading = false; // Stop loading regardless of success or error
+        isLoading = false;
       });
     }
   }

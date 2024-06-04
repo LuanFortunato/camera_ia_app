@@ -3,8 +3,6 @@ import "package:http/http.dart" as http;
 import "dart:convert";
 
 class ImageService {
-  ImageService();
-
   Future<List<Details>> detectImage(String imageBase64) async {
     var response = await _postDetailsDetectionRequest(imageBase64);
     if (response.statusCode == 200) {

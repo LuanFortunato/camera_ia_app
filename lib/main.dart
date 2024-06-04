@@ -20,7 +20,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'Product Detector',
+      debugShowCheckedModeBanner: false,
+      title: 'StockEye',
       home: MainPage(),
     );
   }
@@ -32,15 +33,16 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return const ProductDetectorPage();
-        } else {
-          return const LoginScreen();
-        }
-      },
-    ));
+      body: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return const ProductDetectorPage();
+          } else {
+            return const LoginScreen();
+          }
+        },
+      ),
+    );
   }
 }

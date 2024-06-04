@@ -8,20 +8,18 @@ class ImageDetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              details.name != "No items found"
-                  ? "${details.quantity}x ${details.name}"
-                  : details.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            details.name != "No items found"
+                ? "${details.quantity}x ${details.name}"
+                : details.name,
+            style: const TextStyle(fontSize: 24),
+          ),
+        ],
       ),
     );
   }

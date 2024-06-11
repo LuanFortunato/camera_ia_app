@@ -1,10 +1,9 @@
-import 'package:camera_ia_app/model/details.dart';
 import 'package:flutter/material.dart';
 
 class ImageDetailsWidget extends StatelessWidget {
-  final Details details;
+  final String? cod;
 
-  const ImageDetailsWidget({super.key, required this.details});
+  const ImageDetailsWidget({super.key, required this.cod});
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +13,7 @@ class ImageDetailsWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            details.name != "No items found"
-                ? "${details.quantity}x ${details.name}"
-                : details.name,
+            cod ?? "No code found",
             style: const TextStyle(fontSize: 24),
           ),
         ],

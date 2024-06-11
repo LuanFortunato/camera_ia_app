@@ -1,15 +1,18 @@
+import 'package:camera_ia_app/util/default_button.dart';
 import 'package:camera_ia_app/view/login/sign_up_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+import '../../util/decoration_pattern.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  LoginScreenState createState() => LoginScreenState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -49,12 +52,7 @@ class LoginScreenState extends State<LoginScreen> {
                   children: <Widget>[
                     TextFormField(
                       controller: _emailController,
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                      ),
+                      decoration: DecorationPattern.inputDecoration,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Porfavor, insira um email';
@@ -66,12 +64,7 @@ class LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        labelText: 'Senha',
-                        border: OutlineInputBorder(),
-                      ),
+                      decoration: DecorationPattern.inputDecoration,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Porfavor, insira uma senha';
@@ -80,18 +73,9 @@ class LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    ElevatedButton(
+                    DefaultButton(
                       onPressed: _login,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: const Color.fromRGBO(249, 134, 98, 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 0),
-                      ),
-                      child: const Text('Login'),
+                      text: 'Login',
                     ),
                     const SizedBox(height: 20),
                     Row(
@@ -100,11 +84,14 @@ class LoginScreenState extends State<LoginScreen> {
                         const Text("Não é cadastrado?"),
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (builder) {
-                                  return const SignInScreen();
-                                },
+                            Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const SignUpPage(),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
                               ),
                             );
                           },

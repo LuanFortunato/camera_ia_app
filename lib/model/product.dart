@@ -3,34 +3,24 @@ import 'dart:convert';
 
 class Product {
   String name;
-  int quantity;
+  String cod;
+
   Product({
     required this.name,
-    required this.quantity,
+    required this.cod,
   });
-
-  Product copyWith({
-    int? id,
-    String? name,
-    int? quantity,
-  }) {
-    return Product(
-      name: name ?? this.name,
-      quantity: quantity ?? this.quantity,
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'name': name,
-      'quantity': quantity,
+      'cod': cod,
     };
   }
 
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
       name: map['name'] as String,
-      quantity: map['quantity'] as int,
+      cod: map['cod'] as String,
     );
   }
 

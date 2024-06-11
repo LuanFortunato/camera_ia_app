@@ -39,7 +39,7 @@ class MainPage extends StatelessWidget {
           if (snapshot.hasData) {
             return const ProductDetectorPage();
           } else {
-            return const LoginScreen();
+            return const LoginPage();
           }
         },
       ),

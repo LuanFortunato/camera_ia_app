@@ -3,24 +3,28 @@ import 'dart:convert';
 
 class Product {
   String name;
-  String cod;
+  String code;
+  String uid;
 
   Product({
     required this.name,
-    required this.cod,
+    required this.code,
+    required this.uid,
   });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'name': name,
-      'cod': cod,
+      'cod': code,
+      'uid': uid,
     };
   }
 
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
       name: map['name'] as String,
-      cod: map['cod'] as String,
+      code: map['cod'] as String,
+      uid: map['uid'] as String,
     );
   }
 

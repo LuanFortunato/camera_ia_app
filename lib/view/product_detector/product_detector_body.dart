@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:camera_ia_app/util/default_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../model/product.dart';
 import '../../service/image_service.dart';
-import '../../service/products_service.dart';
-import 'logout_button.dart';
 
 class ProductDetectorBody extends StatefulWidget {
   const ProductDetectorBody({super.key});
@@ -66,12 +65,13 @@ class _ProductDetectorBodyState extends State<ProductDetectorBody> {
       products.add(
         Product(
           name: product!,
-          cod: product,
+          code: product,
+          uid: FirebaseAuth.instance.currentUser!.uid,
         ),
       );
     }
-    var service = ProductsService();
-    service.addProducts(products);
+    // var service = ProductsService();
+    // service.addProducts(products);
   }
 
   void cleanData() {
@@ -111,13 +111,6 @@ class _ProductDetectorBodyState extends State<ProductDetectorBody> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Row(
-          children: [
-            Spacer(),
-            LogoutButton(),
-            SizedBox(width: 20),
-          ],
-        ),
         _image != null
             ? Padding(
                 padding: const EdgeInsets.all(32),

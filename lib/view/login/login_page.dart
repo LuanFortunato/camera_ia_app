@@ -52,7 +52,8 @@ class LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     TextFormField(
                       controller: _emailController,
-                      decoration: DecorationPattern.inputDecoration,
+                      decoration: DecorationPattern.inputDecoration
+                          .copyWith(labelText: 'Email'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Porfavor, insira um email';
@@ -64,7 +65,8 @@ class LoginPageState extends State<LoginPage> {
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: DecorationPattern.inputDecoration,
+                      decoration: DecorationPattern.inputDecoration
+                          .copyWith(labelText: 'Senha'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Porfavor, insira uma senha';

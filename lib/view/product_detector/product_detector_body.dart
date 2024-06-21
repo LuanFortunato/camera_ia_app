@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:camera_ia_app/model/product.dart';
+import 'package:camera_ia_app/service/count_service.dart';
+import 'package:camera_ia_app/service/products_service.dart';
 import 'package:camera_ia_app/util/default_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../model/product.dart';
 import '../../service/image_service.dart';
 
 class ProductDetectorBody extends StatefulWidget {
@@ -17,14 +19,18 @@ class ProductDetectorBody extends StatefulWidget {
 }
 
 class _ProductDetectorBodyState extends State<ProductDetectorBody> {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final ImagePicker _picker = ImagePicker();
-  List<String?> imageList = [];
+  String? prodName;
+  String? productCode;
+  String? prodCount;
   File? _image;
   String responseText = "";
   bool isLoading = false;
+  bool isLoadingCount = false;
 
   Future<void> pickImage() async {
-    const ImageSource source = ImageSource.camera;
+    const ImageSource source = ImageSource.gallery;
 
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
@@ -44,14 +50,29 @@ class _ProductDetectorBodyState extends State<ProductDetectorBody> {
     setState(() {
       isLoading = true;
     });
+
     String imageBase64 = base64.encode(await _image!.readAsBytes());
 
     try {
       var imageService = ImageService();
-      var newList = await imageService.detectImage(imageBase64);
+      String? newProduct = await imageService.detectProduct(imageBase64);
       setState(() {
-        imageList.add(newList);
+        productCode = newProduct;
       });
+      if (productCode == null) {
+        return;
+      }
+      try {
+        var productsService = ProductsService();
+        var snapshot = await productsService.getProductByCode(productCode!);
+        var data = snapshot.docs.first.data() as Map<String, dynamic>;
+        Product product = Product.fromMap(data);
+        setState(() {
+          prodName = product.name;
+        });
+      } catch (e) {
+        return;
+      }
     } finally {
       setState(() {
         isLoading = false;
@@ -59,24 +80,55 @@ class _ProductDetectorBodyState extends State<ProductDetectorBody> {
     }
   }
 
-  void saveProducts() {
-    List<Product> products = [];
-    for (var product in imageList) {
-      products.add(
-        Product(
-          name: product!,
-          code: product,
-          uid: FirebaseAuth.instance.currentUser!.uid,
-        ),
-      );
+  Future<void> countProducts() async {
+    if (_image == null) {
+      return;
     }
-    // var service = ProductsService();
-    // service.addProducts(products);
+    if (prodName == null) {
+      return;
+    }
+
+    setState(() {
+      isLoadingCount = true;
+    });
+
+    var service = ImageService();
+
+    String imageBase64 = base64.encode(await _image!.readAsBytes());
+
+    var count = await service.countProducts(imageBase64, prodName!);
+
+    setState(() {
+      prodCount = count;
+      isLoadingCount = false;
+    });
+  }
+
+  Future<void> saveCount() async {
+    if (prodName == null || prodCount == null) {
+      return;
+    }
+
+    var service = CountService();
+    service.addCount(
+      Product(
+        name: prodName!,
+        code: prodCount!,
+        uid: _firebaseAuth.currentUser!.uid,
+      ),
+      int.parse(prodCount!),
+    );
+    setState(() {
+      cleanData();
+    });
   }
 
   void cleanData() {
     setState(() {
-      imageList = [];
+      prodName = null;
+      productCode = null;
+      prodCount = null;
+      _image = null;
     });
   }
 
@@ -148,19 +200,35 @@ class _ProductDetectorBodyState extends State<ProductDetectorBody> {
             const SizedBox(width: 20),
             DefaultButton(
               onPressed: detectImage,
-              text: 'Detectar Produtos',
+              text: 'Detectar Produto',
             ),
           ],
         ),
         if (isLoading) const CircularProgressIndicator(),
-        Expanded(
-          child: ListView.builder(
-            itemCount: imageList.length,
-            itemBuilder: (context, index) {
-              return null;
-            },
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Center(
+            child: Text(
+              prodName != null && productCode != null
+                  ? 'Produto identificado: $prodName - $productCode'
+                  : '',
+            ),
           ),
         ),
+        Visibility(
+          visible: prodName != null && productCode != null,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: DefaultButton(
+              text: 'Contar',
+              onPressed: countProducts,
+            ),
+          ),
+        ),
+        if (isLoadingCount) const CircularProgressIndicator(),
+        Text(prodName != null && productCode != null && prodCount != null
+            ? "Número de produtos: $prodCount"
+            : ''),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Row(
@@ -170,13 +238,18 @@ class _ProductDetectorBodyState extends State<ProductDetectorBody> {
                 onPressed: cleanData,
                 text: 'Limpar',
               ),
-              const SizedBox(width: 20),
-              DefaultButton(
-                onPressed: () {
-                  saveProducts();
-                  showSaveDialog(context);
-                },
-                text: 'Salvar',
+              Visibility(
+                visible: prodCount != null,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: DefaultButton(
+                    onPressed: () {
+                      saveCount();
+                      showSaveDialog(context);
+                    },
+                    text: 'Salvar',
+                  ),
+                ),
               ),
             ],
           ),

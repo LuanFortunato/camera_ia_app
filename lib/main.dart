@@ -3,12 +3,14 @@ import 'package:camera_ia_app/view/login/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'view/home/home_page.dart';
 import 'view/product_detector/product_detector_page.dart';
 import 'view/products/products_page.dart';
 
 Future main() async {
+  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

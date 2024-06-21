@@ -27,9 +27,8 @@ class ProductsService {
     return productsStream;
   }
 
-  // void addProducts(List<Product> products) {
-  //   for (var product in products) {
-  //     _firebaseFirestore.collection('products').add(product.toMap());
-  //   }
-  // }
+  Future<QuerySnapshot> getProductByCode(String code) async {
+    final prodName = await products.where('cod', isEqualTo: code).get();
+    return prodName;
+  }
 }

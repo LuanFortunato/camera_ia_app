@@ -1,5 +1,4 @@
 import 'package:camera_ia_app/service/products_service.dart';
-import 'package:camera_ia_app/view/products/logout_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -32,13 +31,9 @@ class _ProductsPageState extends State<ProductsPage> {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(223, 228, 224, 1),
       appBar: AppBar(
+        centerTitle: true,
+        title: const Text("Produtos"),
         backgroundColor: const Color.fromRGBO(223, 228, 224, 1),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: LogoutButton(),
-          ),
-        ],
       ),
       floatingActionButton: FloatingActionButton(
         foregroundColor: Colors.black,
@@ -53,6 +48,9 @@ class _ProductsPageState extends State<ProductsPage> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List products = snapshot.data!.docs;
+            if (products.isEmpty) {
+              return const Text("Nenhum produto encontrado");
+            }
             return ListView.builder(
               itemCount: products.length,
               itemBuilder: (context, index) {
@@ -62,15 +60,38 @@ class _ProductsPageState extends State<ProductsPage> {
                     document.data() as Map<String, dynamic>;
                 Product product = Product.fromMap(data);
 
-                return ListTile(
-                  leading: Text(product.name),
-                  trailing: Text(product.code),
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        product.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      subtitle: Row(
+                        children: [
+                          const Icon(Icons.qr_code),
+                          const SizedBox(width: 10),
+                          Text(
+                            product.code,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                  ],
                 );
               },
             );
           } else {
             return const Center(
-              child: Text('Nenhum produto encontrado ...'),
+              child: CircularProgressIndicator(),
             );
           }
         },

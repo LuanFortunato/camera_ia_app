@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:camera_ia_app/model/product.dart';
 import 'package:camera_ia_app/service/count_service.dart';
 import 'package:camera_ia_app/service/products_service.dart';
+import 'package:camera_ia_app/util/decoration_pattern.dart';
 import 'package:camera_ia_app/util/default_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ class _ProductDetectorBodyState extends State<ProductDetectorBody> {
   String responseText = "";
   bool isLoading = false;
   bool isLoadingCount = false;
+  TextEditingController countController = TextEditingController();
 
   Future<void> pickImage() async {
     const ImageSource source = ImageSource.gallery;
@@ -161,100 +163,167 @@ class _ProductDetectorBodyState extends State<ProductDetectorBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _image != null
-            ? Padding(
-                padding: const EdgeInsets.all(32),
-                child: SizedBox(
-                  height: 200,
-                  child: Image.file(_image!, fit: BoxFit.cover),
-                ),
-              )
-            : Container(
-                margin: const EdgeInsets.all(32),
-                height: 250,
-                width: 170,
-                decoration: const BoxDecoration(
-                  color: Colors.black12,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(8),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _image != null
+              ? Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: SizedBox(
+                    height: 200,
+                    child: Image.file(_image!, fit: BoxFit.cover),
+                  ),
+                )
+              : Container(
+                  margin: const EdgeInsets.all(32),
+                  height: 250,
+                  width: 170,
+                  decoration: const BoxDecoration(
+                    color: Colors.black12,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8),
+                    ),
                   ),
                 ),
-              ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: pickImage,
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: const Color.fromRGBO(249, 134, 98, 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-              ),
-              child: const Text('Tirar foto'),
-            ),
-            const SizedBox(width: 20),
-            DefaultButton(
-              onPressed: detectImage,
-              text: 'Detectar Produto',
-            ),
-          ],
-        ),
-        if (isLoading) const CircularProgressIndicator(),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Center(
-            child: Text(
-              prodName != null && productCode != null
-                  ? 'Produto identificado: $prodName - $productCode'
-                  : '',
-            ),
-          ),
-        ),
-        Visibility(
-          visible: prodName != null && productCode != null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: DefaultButton(
-              text: 'Contar',
-              onPressed: countProducts,
-            ),
-          ),
-        ),
-        if (isLoadingCount) const CircularProgressIndicator(),
-        Text(prodName != null && productCode != null && prodCount != null
-            ? "Número de produtos: $prodCount"
-            : ''),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              DefaultButton(
-                onPressed: cleanData,
-                text: 'Limpar',
+              ElevatedButton(
+                onPressed: pickImage,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color.fromRGBO(249, 134, 98, 1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                ),
+                child: const Text('Tirar foto'),
+              ),
+              const SizedBox(width: 20),
+              Visibility(
+                visible: prodName == null,
+                child: DefaultButton(
+                  onPressed: detectImage,
+                  text: 'Detectar Produto',
+                ),
               ),
               Visibility(
-                visible: prodCount != null,
+                visible: prodName != null && productCode != null,
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   child: DefaultButton(
-                    onPressed: () {
-                      saveCount();
-                      showSaveDialog(context);
-                    },
-                    text: 'Salvar',
+                    text: 'Contar',
+                    onPressed: countProducts,
                   ),
                 ),
               ),
             ],
           ),
-        ),
-      ],
+          if (isLoading) const CircularProgressIndicator(),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: Text(
+                prodName != null && productCode != null
+                    ? 'Produto identificado: $prodName - $productCode'
+                    : '',
+              ),
+            ),
+          ),
+          if (isLoadingCount) const CircularProgressIndicator(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(prodName != null && productCode != null && prodCount != null
+                  ? "Número de produtos: $prodCount"
+                  : ''),
+              const SizedBox(width: 30),
+              Visibility(
+                visible: prodCount != null,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: DefaultButton(
+                    text: 'Alterar contagem',
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(
+                                  'Adicionar novo produto',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                TextField(
+                                  controller: countController,
+                                  decoration: DecorationPattern.inputDecoration
+                                      .copyWith(labelText: 'Nome'),
+                                ),
+                                const SizedBox(height: 12),
+                                const SizedBox(height: 12),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      prodCount = countController.text;
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Colors.red,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 0),
+                                  ),
+                                  child: const Text('Confirmar'),
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DefaultButton(
+                  onPressed: cleanData,
+                  text: 'Limpar',
+                ),
+                Visibility(
+                  visible: prodCount != null,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: DefaultButton(
+                      onPressed: () {
+                        saveCount();
+                        showSaveDialog(context);
+                      },
+                      text: 'Salvar',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

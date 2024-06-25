@@ -19,4 +19,12 @@ class CountService {
       ).toMap(),
     );
   }
+
+  Stream<QuerySnapshot> getCountsStream() {
+    Stream<QuerySnapshot> countsStream = counts
+        .where('uid', isEqualTo: _firebaseAuth.currentUser!.uid)
+        .snapshots();
+
+    return countsStream;
+  }
 }

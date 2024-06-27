@@ -1,17 +1,20 @@
-import 'dart:math';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+
+import '../../model/count.dart';
 
 class ProductsChart extends StatelessWidget {
   const ProductsChart({
     super.key,
+    required this.counts,
   });
+
+  final List<Count> counts;
 
   @override
   Widget build(BuildContext context) {
     return BarChart(
-      randomData(),
+      createData(counts),
     );
   }
 }
@@ -42,18 +45,18 @@ Widget getTitles(double value, TitleMeta meta) {
     fontWeight: FontWeight.bold,
     fontSize: 14,
   );
+
   List<String> days = [
-    'M',
-    'T',
-    'W',
-    'T',
-    'F',
-    'S',
-    'S',
-    'S',
-    'S',
-    'S',
-    'S',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
   ];
 
   Widget text = Text(
@@ -68,11 +71,18 @@ Widget getTitles(double value, TitleMeta meta) {
   );
 }
 
-BarChartData randomData() {
+double roundTo10(int num) {
+  while (num % 10 != 0) {
+    num += 1;
+  }
+  return num.toDouble();
+}
+
+BarChartData createData(List<Count> counts) {
   return BarChartData(
-    maxY: 300,
+    maxY: roundTo10(counts.first.quantity),
     barTouchData: BarTouchData(
-      enabled: false,
+      enabled: true,
     ),
     titlesData: const FlTitlesData(
       show: true,
@@ -85,8 +95,8 @@ BarChartData randomData() {
       ),
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
-          reservedSize: 0,
-          showTitles: false,
+          reservedSize: 50,
+          showTitles: true,
         ),
       ),
       topTitles: AxisTitles(
@@ -104,10 +114,10 @@ BarChartData randomData() {
       show: false,
     ),
     barGroups: List.generate(
-      10,
+      counts.length <= 10 ? counts.length : 10,
       (i) => makeGroupData(
         i,
-        Random().nextInt(290).toDouble() + 10,
+        counts[i].quantity.toDouble(),
       ),
     ),
     gridData: const FlGridData(show: false),

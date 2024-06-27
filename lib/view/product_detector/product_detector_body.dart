@@ -264,7 +264,7 @@ class _ProductDetectorBodyState extends State<ProductDetectorBody> {
                                 TextField(
                                   controller: countController,
                                   decoration: DecorationPattern.inputDecoration
-                                      .copyWith(labelText: 'Nome'),
+                                      .copyWith(labelText: 'Quantidade'),
                                 ),
                                 const SizedBox(height: 12),
                                 const SizedBox(height: 12),
